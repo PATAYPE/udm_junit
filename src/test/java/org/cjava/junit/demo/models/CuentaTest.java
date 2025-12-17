@@ -16,8 +16,9 @@ class CuentaTest {
         //cuenta.setPersona("Andres");
         String esperado = "Julio";
         String real = cuenta.getPersona();
-        assertEquals(esperado, real );
-        assertTrue(esperado.equals(real));
+        assertNotNull(real, "La cuenta no puede ser nula");
+        assertEquals(esperado, real, "El nombre de la cuenta no es el que se esperaba" );
+        assertTrue(esperado.equals(real), "El nombre de la cuenta  esperada debe ser igual a la real");
     }
 
     @Test
@@ -77,21 +78,23 @@ class CuentaTest {
         banco.setNombre("Banco del Estado");
         banco.addCuenta(cuenta1);
         banco.addCuenta(cuenta2);
-
         banco.transferirDineroCuenta(cuenta2, cuenta1, new BigDecimal(500));
-        assertEquals(2, banco.getCuentas().size());
 
-        assertEquals("Banco del Estado", cuenta1.getBanco().getNombre());
-
-        assertEquals("Julio", banco.getCuentas()
-                .stream()
-                .filter( c -> c.getPersona().equals("Julio") )
-                .findFirst()
-                .get().getPersona());
-
-        assertTrue( banco.getCuentas()
-                .stream()
-                .anyMatch( c -> c.getPersona().equals("Jhon Doe") ) );
-
+        assertAll(
+                ()-> { assertEquals(2, banco.getCuentas().size());},
+                ()-> assertEquals("1000.8989", cuenta2.getSaldo().toPlainString() ),
+                ()-> assertEquals("3000", cuenta1.getSaldo().toPlainString() ),
+                ()-> assertEquals("Banco del Estado", cuenta1.getBanco().getNombre() ),
+                ()-> assertEquals("Julio", banco.getCuentas()
+                        .stream()
+                        .filter( c -> c.getPersona().equals("Julio") )
+                        .findFirst()
+                        .get().getPersona() ),
+                ()-> assertTrue( banco.getCuentas()
+                        .stream()
+                        .anyMatch( c -> c.getPersona().equals("Jhon Doe") ) )
+        );
     }
+
+
 }
